@@ -65,7 +65,7 @@
             </div>
             <div class="mb-3" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <a href="{{ route('punyaakun') }}" style="display: block;">Punya Akun?</a>
+                    <a href="{{ route('login') }}" style="display: block;">Punya Akun?</a>
                 </div>
                 <button type="submit" class="btn btn-primary">Register</button>
             </div>

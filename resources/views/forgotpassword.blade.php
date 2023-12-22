@@ -18,6 +18,15 @@
     <div class="forgot-box">
         <img src="https://www.cakeresume.com/cdn-cgi/image/fit=scale-down,format=auto,w=1200/https://images.cakeresume.com/images/19f33da4-afbc-4abd-8f66-cb6c24fa4aa2.jpeg" alt="" style="width:auto; height:250px; border-radius: 30px;">
         <h1 style="text-align:center; margin: 10px 0px;">Forgot Password</h1>
+        @if($errors->any())
+        @foreach($errors->all() as $err)
+        <p class="alert alert-danger">{{$err}}</p>
+        @endforeach
+        @endif
+
+        @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
         <form>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email</label>

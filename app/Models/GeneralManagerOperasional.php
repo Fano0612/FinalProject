@@ -11,8 +11,11 @@ class GeneralManagerOperasional extends Authenticatable
 {
     use Notifiable;
     use HasFactory;
-    protected $table = 'generalmanageroperasional' ;
+    protected $table = 'generalmanageroperasional';
     protected $primaryKey = 'id_generalmanageroperasional';
-
-    protected $fillable = ['email','nama','nomor_telepon', 'username', 'password','jabatan','status','gambar'];
+    protected $fillable = ['email', 'nama', 'nomor_telepon', 'username', 'password', 'jabatan', 'status', 'gambar'];
+    public function user()
+    {
+        return $this->morphOne(User::class, 'userable');
+    }
 }

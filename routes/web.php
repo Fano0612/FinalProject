@@ -18,12 +18,12 @@ use App\Http\Controllers\PasscodeController;
 Route::get('', function () {
     return view('login');
 });
-Route::get('/login', function () {
-    return view('login');
-})->name('punyaakun');
+Route::get('login', [User::class, 'login'])->name('login');
+Route::POST('login', [User::class, 'loginacc'])->name('loginacc');
 Route::get('/forgotpassword', function () {
     return view('forgotpassword');
 })->name('lupapassword');
+Route::get('logout', [User::class, 'logout'])->name('logout');
 
 
 // pelanggan

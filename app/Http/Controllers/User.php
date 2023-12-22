@@ -83,7 +83,7 @@ class User extends Controller
         }
 
         $user->save();
-        return redirect()->route('punyaakun')->with('success', 'Data Successfully Registered');
+        return redirect()->route('login')->with('success', 'Data Successfully Registered');
     }
     public function registeraccstaff(Request $request)
     {
@@ -115,50 +115,50 @@ class User extends Controller
 
         if ($request->jabatan == 'karyawan') {
             $user = new Karyawan([
-            'email' => $request->email,
-            'nama' => $request->nama,
-            'nomor_telepon' => $request->nomor_telepon,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'jabatan' => $request->jabatan,
+                'email' => $request->email,
+                'nama' => $request->nama,
+                'nomor_telepon' => $request->nomor_telepon,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'jabatan' => $request->jabatan,
             ]);
         } elseif ($request->jabatan == 'generalmanageroperasional') {
             $user = new GeneralManagerOperasional([
-            'email' => $request->email,
-            'nama' => $request->nama,
-            'nomor_telepon' => $request->nomor_telepon,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'jabatan' => $request->jabatan,
+                'email' => $request->email,
+                'nama' => $request->nama,
+                'nomor_telepon' => $request->nomor_telepon,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'jabatan' => $request->jabatan,
             ]);
         }
-    
+
         if ($request->hasFile('gambar')) {
             $gambar = $request->file('gambar');
             $filename = time() . '_' . $gambar->getClientOriginalName();
             $gambar->move(public_path('images'), $filename);
             $user->gambar = $filename;
         }
-    
+
         $user->save();
-    
-        return redirect()->route('punyaakun')->with('success', 'Data Successfully Registered');
+
+        return redirect()->route('login')->with('success', 'Data Successfully Registered');
     }
     public function showPasswordForm()
-{
-    return view('password_form');
-}
+    {
+        return view('password_form');
+    }
 
-public function checkPassword(Request $request)
-{
-    $request->validate([
-        'password' => 'required|password_check',
-    ]);
+    public function checkPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|password_check',
+        ]);
 
-    session(['entered_password' => true]);
+        session(['entered_password' => true]);
 
-    return redirect()->route('register.staff');
-}
+        return redirect()->route('register.staff');
+    }
 
 
     public function login()
@@ -170,60 +170,74 @@ public function checkPassword(Request $request)
     public function loginacc(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'username' => 'required|username',
             'password' => 'required',
         ]);
-    
-        $credentials = $request->only(['email', 'password']);
-    
-        if (Auth::attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ])) {
-    
-            $user = Auth::user();
-            if ($user && $user->status === 'inactive') {
-                $user->status = 'active';
-                $user->save();
-                $request->session()->regenerate();
-    
-                if ($user->access_rights === 'Merchant') {
-                    return redirect()->intended('product_menu');
-                } else if ($user->access_rights === 'User') {
-                    return redirect()->intended('homepage');
-                }
-            }
+
+        $userTypes = ['Pelanggan', 'Karyawan', 'GeneralManagerOperasional'];
+        $user = collect();
+
+        foreach ($userTypes as $userType) {
+            $user = $user->merge(app("App\\Models\\{$userType}")->where('username', $request->input('username'))->take(1)->get());
         }
-    
-        return back()->withErrors([
-            'email' => 'Email or Password is incorrect',
-        ]);
+
+        $user = $user->first();
+        if (!$user) {
+            return back()->withErrors([
+                'username' => 'Username is incorrect',
+            ]);
+        }
+
+        if (!Hash::check($request->input('password'), $user->password)) {
+            return back()->withErrors([
+                'password' => 'Password is incorrect',
+            ]);
+        }
+
+        if ($user->status === 'inactive') {
+            $user->status = 'active';
+            $user->save();
+            $request->session()->regenerate();
+        }
+
+        switch ($user->jabatan ?? 'pelanggan') {
+            case 'karyawan':
+                return redirect()->intended('dashboardkaryawan');
+            case 'generalmanageroperasional':
+                return redirect()->intended('dashboardgeneralmanageroperasional');
+            default:
+                return redirect('dashboardpelanggan');
+        }
     }
-    
+
 
     public function logout(Request $request)
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            $user->status = 'inactive';
-            $user->save();
+            $username = Auth::user()->username;
+
+            $user = app("App\\Models\\Pelanggan")->where('username', $username)->first();
+
+            if ($user) {
+                $user->status = 'inactive';
+                $user->save();
+            }
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-
         }
-        return view('landing');
-    }
 
-
-    public function AccountExist()
-    {
         return view('login');
     }
-    public function AccountUnexist()
-    {
-        return view('register');
-    }
+
+
+
+
+
+
+
+
 
     public function forgotPassword(Request $request)
     {

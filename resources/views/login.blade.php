@@ -18,14 +18,30 @@
     <div class="login-box">
         <img src="https://www.cakeresume.com/cdn-cgi/image/fit=scale-down,format=auto,w=1200/https://images.cakeresume.com/images/19f33da4-afbc-4abd-8f66-cb6c24fa4aa2.jpeg" alt="" style="width:auto; height:250px; border-radius: 30px;">
         <h1 style="text-align:center; margin: 10px 0px;">Login</h1>
-        <form>
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+        @endif
+        <form action="{{ route('loginacc') }}" method="post">
+            @csrf
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Username</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+                <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" required>
+                <input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
             </div>
             <div class="mb-3" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -34,8 +50,8 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </div>
-
         </form>
+
     </div>
 
 
