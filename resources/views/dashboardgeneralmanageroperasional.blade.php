@@ -1,17 +1,17 @@
 <?php
-if (!auth()->check() || auth()->user()->jabatan != 'active') {
+if (!auth()->check() || auth()->user()->status != 'active') {
     echo "<script>alert('Please login to access the system!');</script>";
     echo "<script>setTimeout(function() { window.location.href = '/login'; }, 1000);</script>";
     die();
 }
-// if (auth()->user()->access_rights != 'User') {
-//     echo "<script>alert('You are not a User!');</script>";
-//     echo "<script>setTimeout(function() { window.location.href = '/product_menu'; }, 1000);</script>";
-//     die();
-// }
+if (auth()->user()->jabatan != 'generalmanageroperasional') {
+    echo "<script>alert('You are not a General Manager Operasional!');</script>";
+    echo "<script>setTimeout(function() { window.location.href = '/login'; }, 1000);</script>";
+    die();
+}
 
-// $user = auth()->user();
-// $profilePicture = $user->picture;
+$user = auth()->user();
+$profilePicture = $user->gambar;
 ?>
 <!doctype html>
 <html lang="en">
@@ -23,7 +23,10 @@ if (!auth()->check() || auth()->user()->jabatan != 'active') {
   </head>
   <body>
     <h1>Dashboard General Manager Operasional</h1>
-    <a class="item" href="{{route ('logout')}}">Logout</a>
+    @if (auth()->check())
+    <a href="">Hello, <b>{{ auth()->user()->username }}</b></a>
+    <a class="item" href="{{ route('logout') }}">Logout</a>
+@endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
 </html>

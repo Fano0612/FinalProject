@@ -1,3 +1,22 @@
+<?php
+if (auth()->check()) {
+    if (auth()->user()->jabatan == 'pelanggan') {
+        header('Location: /dashboardpelanggan');
+        exit();
+    } elseif (auth()->user()->jabatan == 'karyawan') {
+        header('Location: /dashboardkaryawan');
+        exit();
+    }
+    elseif (auth()->user()->jabatan == 'generalmanageroperasional') {
+        header('Location: /dashboardgeneralmanageroperasional');
+        exit();
+    }
+}
+if (auth()->check() && auth()->user()->status != 'active') {
+    header('Location: /login');
+    exit();
+}
+?>
 <!doctype html>
 <html lang="en">
 

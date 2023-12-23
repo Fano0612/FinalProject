@@ -16,9 +16,6 @@ class Pelanggan extends Authenticatable
 
     protected $fillable = ['email','nama','nomor_telepon', 'username', 'password','status','status_belanja_bantuan_karyawan','gambar'];
    
-    public function user()
-    {
-        return $this->morphOne(User::class, 'userable');
-    }
+
 }
 

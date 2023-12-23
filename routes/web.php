@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\User;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PasscodeController;
 
 /*
@@ -18,17 +18,17 @@ use App\Http\Controllers\PasscodeController;
 Route::get('', function () {
     return view('login');
 });
-Route::get('login', [User::class, 'login'])->name('login');
-Route::POST('login', [User::class, 'loginacc'])->name('loginacc');
+Route::get('login', [UserController::class, 'login'])->name('login');
+Route::POST('login', [UserController::class, 'loginacc'])->name('loginacc');
 Route::get('/forgotpassword', function () {
     return view('forgotpassword');
 })->name('lupapassword');
-Route::get('logout', [User::class, 'logout'])->name('logout');
+Route::get('logout', [UserController::class, 'logout'])->name('logout');
 
 
 // pelanggan
-Route::POST('register', [User::class, 'registeracc'])->name('registeracc');
-Route::get('register', [User::class, 'register'])->name('register');
+Route::POST('register', [UserController::class, 'registeracc'])->name('registeracc');
+Route::get('register', [UserController::class, 'register'])->name('register');
 Route::get('/dashboardpelanggan', function () {
     return view('dashboardpelanggan');
 })->name('dashboardpelanggan');
@@ -41,8 +41,8 @@ Route::get('/dashboardkaryawan', function () {
 Route::get('/dashboardgeneralmanageroperasional', function () {
     return view('dashboardgeneralmanageroperasional');
 })->name('dashboardgeneralmanageroperasional');
-Route::POST('registerstaff', [User::class, 'registeraccstaff'])->name('registeraccstaff');
-Route::get('registerstaff', [User::class, 'registerstaff'])->name('registerstaff');
+Route::POST('registerstaff', [UserController::class, 'registeraccstaff'])->name('registeraccstaff');
+Route::get('registerstaff', [UserController::class, 'registerstaff'])->name('registerstaff');
 
 
 Route::get('/password', function () {

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pelanggan;
 use App\Models\Karyawan;
 use App\Models\GeneralManagerOperasional;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 
 
-class User extends Controller
+class UserController extends Controller
 {
     public function register()
     {
@@ -83,6 +84,16 @@ class User extends Controller
         }
 
         $user->save();
+        $userlist = new User([
+            'email' => $user->email,
+            'nama' => $user->nama,
+            'nomor_telepon' => $user->nomor_telepon,
+            'username' => $user->username,
+            'password' => $user->password, 
+            'gambar' => $user->gambar,
+        ]);
+    
+        $userlist->save();
         return redirect()->route('login')->with('success', 'Data Successfully Registered');
     }
     public function registeraccstaff(Request $request)
@@ -141,7 +152,17 @@ class User extends Controller
         }
 
         $user->save();
-
+        $userlist = new User([
+            'email' => $user->email,
+            'nama' => $user->nama,
+            'nomor_telepon' => $user->nomor_telepon,
+            'username' => $user->username,
+            'password' => $user->password, 
+            'jabatan' => $user->jabatan, 
+            'gambar' => $user->gambar,
+        ]);
+    
+        $userlist->save();
         return redirect()->route('login')->with('success', 'Data Successfully Registered');
     }
     public function showPasswordForm()
@@ -173,69 +194,49 @@ class User extends Controller
             'username' => 'required|username',
             'password' => 'required',
         ]);
-
-        $userTypes = ['Pelanggan', 'Karyawan', 'GeneralManagerOperasional'];
-        $user = collect();
-
-        foreach ($userTypes as $userType) {
-            $user = $user->merge(app("App\\Models\\{$userType}")->where('username', $request->input('username'))->take(1)->get());
+    
+        $credentials = $request->only(['username', 'password']);
+    
+        if (Auth::attempt([
+            'username' => $credentials['username'],
+            'password' => $credentials['password']
+        ])) {
+    
+            $user = Auth::user();
+            if ($user && $user->status === 'inactive') {
+                $user->status = 'active';
+                $user->save();
+                $request->session()->regenerate();
+    
+                if ($user->jabatan === 'pelanggan') {
+                    return redirect()->intended('dashboardpelanggan');
+                } else if ($user->jabatan === 'karyawan') {
+                    return redirect()->intended('dashboardkaryawan');
+                }
+                else if ($user->jabatan === 'generalmanageroperasional') {
+                    return redirect()->intended('dashboardgeneralmanageroperasional');
+                }
+            }
         }
-
-        $user = $user->first();
-        if (!$user) {
-            return back()->withErrors([
-                'username' => 'Username is incorrect',
-            ]);
-        }
-
-        if (!Hash::check($request->input('password'), $user->password)) {
-            return back()->withErrors([
-                'password' => 'Password is incorrect',
-            ]);
-        }
-
-        if ($user->status === 'inactive') {
-            $user->status = 'active';
-            $user->save();
-            $request->session()->regenerate();
-        }
-
-        switch ($user->jabatan ?? 'pelanggan') {
-            case 'karyawan':
-                return redirect()->intended('dashboardkaryawan');
-            case 'generalmanageroperasional':
-                return redirect()->intended('dashboardgeneralmanageroperasional');
-            default:
-                return redirect('dashboardpelanggan');
-        }
+    
+        return back()->withErrors([
+            'email' => 'Email or Password is incorrect',
+        ]);
     }
-
 
     public function logout(Request $request)
     {
         if (Auth::check()) {
-            $username = Auth::user()->username;
-
-            $user = app("App\\Models\\Pelanggan")->where('username', $username)->first();
-
-            if ($user) {
-                $user->status = 'inactive';
-                $user->save();
-            }
-
+            $user = Auth::user();
+            $user->status = 'inactive';
+            $user->save();
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-        }
 
+        }
         return view('login');
     }
-
-
-
-
-
-
 
 
 

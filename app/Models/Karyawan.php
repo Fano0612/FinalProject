@@ -14,8 +14,5 @@ class Karyawan extends Authenticatable
     protected $table = 'karyawan';
     protected $primaryKey = 'id_karyawan';
     protected $fillable = ['email','nama','nomor_telepon', 'username', 'password','jabatan','status','status_belanja_bantuan_karyawan','gambar'];
-    public function user()
-    {
-        return $this->morphOne(User::class, 'userable');
-    }
+
 }
